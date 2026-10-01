@@ -13,7 +13,7 @@
 }
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);margin:0;padding:8px 8px 8px;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1024px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.wrap{max-width:1024px;margin:0 auto;display:flex;flex-direction:column;gap:8px;border:1px solid #DDE3E2;border-radius:16px;padding:12px;background:#fff}
 .head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px}
 .head h1{font-size:clamp(16px,2.4vw,22px);font-weight:900;margin:0;letter-spacing:-.02em;text-wrap:balance}
 .head p{margin:4px 0 0;color:var(--muted);font-size:14px}
@@ -109,7 +109,7 @@ let cur=0, tipTimer=null;
 function showTip(){clearTimeout(tipTimer);const t=stage.querySelector('.tip');if(t)t.classList.add('show')}
 $('dots').innerHTML=Array.from({length:10},()=>'<i></i>').join('');
 function sizeStage(){const wrap=stage.parentElement, note=document.querySelector('.note');
-  const avail=window.innerHeight-stage.offsetTop-10;
+  const avail=window.innerHeight-(stage.getBoundingClientRect().top+window.scrollY)-8-12-1-2;
   const w=Math.min(wrap.clientWidth,Math.max(320,avail*4/3)); stage.style.width=Math.floor(w)+'px';}
 window.addEventListener('resize',sizeStage);
 function fit(){screen.style.transform='scale('+(stage.clientWidth/1024)+')';placeTip()}
