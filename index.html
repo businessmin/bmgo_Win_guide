@@ -63,9 +63,14 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);margin:0;pad
 @keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
 .done{position:absolute;left:308px;right:10px;bottom:30px;display:flex;flex-direction:column;align-items:center;gap:14px;animation:rise .5s ease-out both}
 .done p{margin:0;font:700 18px var(--f-body);color:#16201F}
-.home-btn{font:700 18px var(--f-body);color:#fff;background:#16201F;border:0;border-radius:12px;padding:16px 36px;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.home-btn{font:700 22px var(--f-body);color:#fff;background:#16201F;border:0;border-radius:14px;padding:20px 52px;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.2)}
 .home-btn:hover{background:#000}
-@keyframes rise{from{transform:translateY(16px);opacity:.3}to{transform:none;opacity:1}}
+.done.card{left:300px;right:206px;bottom:30px}
+.wrap.bare{border:0;padding:0;border-radius:0;gap:0}
+.wrap.bare .head,.wrap.bare .bar{display:none}
+.wrap.bare .stage{box-shadow:none}
+body:has(.wrap.bare){padding:0}
+@keyframes rise{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
 .note{color:var(--muted);font-size:13px;margin:0}
 @media (prefers-reduced-motion:reduce){.hot::after,.done,.tip.shake,.hint b{animation:none}.tip,.tip.show{transition:none}}
 </style>
@@ -93,27 +98,27 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);margin:0;pad
 <script>
 const IMG={"s01_login": "images/s01_login.webp", "s02_home": "images/s02_home.webp", "s02_scroll": "images/s02_scroll.webp", "s03_status": "images/s03_status.webp", "s04_cs": "images/s04_cs.webp", "s05_noti": "images/s05_noti.webp", "s06_tray": "images/s06_tray.webp", "s07_cards": "images/s07_cards.webp", "s08_history": "images/s08_history.webp", "s09_program": "images/s09_program.webp", "s10_receipt": "images/s10_receipt.webp", "s10_scroll": "images/s10_scroll.webp", "s11_test": "images/s11_test.webp"};
 const STEPS=[
- {img:'s01_login',label:'로그인하기',hot:[329,440,367,48],tip:'로그인 버튼을 눌러보세요',pos:'b'},
- {img:'s02_home',label:'새로워진 홈 화면',hot:[160,18,136,36],tip:'영업현황 버튼을 눌러보세요',sub:'가게 영업 현황을 확인할 수 있어요.',pos:'b',
+ {img:'s01_login',label:'로그인 지면',hot:[329,440,367,48],tip:'로그인 버튼을 눌러보세요',pos:'b'},
+ {img:'s02_home',label:'홈지면에서 셀프서비스 이용 가능',hot:[160,18,136,36],tip:'영업현황 버튼을 눌러보세요',sub:'가게 영업 현황을 확인할 수 있어요.',pos:'b',
   scroll:{x:104,y:128,w:854,h:630,img:'s02_scroll',hint:[952,443],br:'0 0 0 16px',arrows:[[958,144,48,299,-1],[958,443,48,299,1]]}},
- {img:'s03_status',label:'영업현황 확인하기',hot:[964,16,40,40],tip:'고객센터 버튼을 눌러보세요',pos:'b',align:'right'},
- {img:'s04_cs',label:'고객센터 열어보기',hot:[900,16,40,40],tip:'알림센터 버튼을 눌러보세요',pos:'l'},
- {img:'s05_noti',label:'알림센터 확인하기',hot:[12,178,80,74],tip:'처리중 버튼을 눌러보세요',pos:'r'},
- {img:'s06_tray',label:'처리중 주문 확인',hot:[955,82,40,40],tip:'카드형 목록 버튼을 눌러보세요',sub:'주문을 카드 모양으로 볼 수 있어요.',pos:'b',align:'right'},
- {img:'s07_cards',label:'카드형 목록으로 보기',hot:[12,268,80,74],tip:'주문내역 버튼을 눌러보세요',pos:'r'},
- {img:'s08_history',label:'주문내역 확인하기',hot:[12,358,80,74],tip:'설정 버튼을 눌러보세요',pos:'r'},
- {img:'s09_program',label:'설정 화면',hot:[104,288,196,48],tip:'영수증 설정 버튼을 눌러보세요',pos:'r'},
- {img:'s10_receipt',label:'영수증 설정',hot:[104,384,196,48],tip:'테스트 주문 버튼을 눌러보세요',pos:'b',maxw:196,
+ {img:'s03_status',label:'영업현황 간편히 확인',hot:[964,16,40,40],tip:'고객센터 버튼을 눌러보세요',pos:'b',align:'right'},
+ {img:'s04_cs',label:'고객센터 간편히 이용',hot:[900,16,40,40],tip:'알림센터 버튼을 눌러보세요',pos:'l'},
+ {img:'s05_noti',label:'알림센터 간편히 확인',hot:[12,178,80,74],tip:'처리중 버튼을 눌러보세요',pos:'r'},
+ {img:'s06_tray',label:'달라진 처리중 지면',hot:[955,82,40,40],tip:'카드형 목록 버튼을 눌러보세요',sub:'주문을 카드 모양으로 볼 수 있어요.',pos:'b',align:'right'},
+ {img:'s07_cards',label:'여러 주문을 카드형으로 한눈에 확인',hot:[12,268,80,74],tip:'주문내역 버튼을 눌러보세요',pos:'r'},
+ {img:'s08_history',label:'달라진 주문내역 지면',hot:[12,358,80,74],tip:'설정 버튼을 눌러보세요',pos:'r'},
+ {img:'s09_program',label:'달라진 설정 지면',hot:[104,288,196,48],tip:'영수증 설정 버튼을 눌러보세요',pos:'r'},
+ {img:'s10_receipt',label:'영수증 설정 지면',hot:[104,384,196,48],tip:'테스트 주문 버튼을 눌러보세요',pos:'b',maxw:196,
   scroll:{x:308,y:72,w:638,h:686,img:'s10_scroll',hint:[944,330]}},
- {img:'s11_test',label:'테스트 주문 화면',final:true}
+ {img:'s11_test',label:'테스트 주문 지면',final:true}
 ];
 const $=id=>document.getElementById(id);
 const screen=$('screen'), stage=$('stage');
-let cur=0, tipTimer=null;
+let cur=0, tipTimer=null, doneTimer=null;
 let tipClosed=false;
 function showTip(){clearTimeout(tipTimer);if(tipClosed)return;const t=stage.querySelector('.tip');if(t)t.classList.add('show')}
 function closeTip(e){e.stopPropagation();clearTimeout(tipTimer);tipClosed=true;const t=stage.querySelector('.tip');if(t)t.remove()}
-$('dots').innerHTML=Array.from({length:10},()=>'<i></i>').join('');
+$('dots').innerHTML=Array.from({length:STEPS.length},()=>'<i></i>').join('');
 function sizeStage(){const wrap=stage.parentElement, note=document.querySelector('.note');
   const avail=window.innerHeight-(stage.getBoundingClientRect().top+window.scrollY)-8-12-1-2;
   const w=Math.min(wrap.clientWidth,Math.max(320,avail*4/3)); stage.style.width=Math.floor(w)+'px';}
@@ -122,7 +127,7 @@ function fit(){screen.style.transform='scale('+(stage.clientWidth/1024)+')';plac
 new ResizeObserver(fit).observe(stage);
 function render(){
   const s=STEPS[cur];
-  clearTimeout(tipTimer); tipClosed=false; screen.innerHTML=''; stage.querySelectorAll('.tip,.hint').forEach(e=>e.remove());
+  clearTimeout(tipTimer); clearTimeout(doneTimer); tipClosed=false; screen.innerHTML=''; stage.querySelectorAll('.tip,.hint').forEach(e=>e.remove());
   const base=new Image(); base.className='base'; base.src=IMG[s.img]; base.alt=s.label+' 화면'; base.draggable=false;
   screen.appendChild(base);
   if(s.scroll){const d=document.createElement('div');d.className='scroller';
@@ -133,21 +138,21 @@ function render(){
       Object.assign(a.style,{left:ax+'px',top:ay+'px',width:aw+'px',height:ah+'px'});a.onclick=e=>{e.stopPropagation();d.scrollBy({top:dir*300,behavior:'smooth'})};screen.appendChild(a);});
     if(s.scroll.hint){const hn=document.createElement('div');hn.className='hint';hn.innerHTML='<b>↕</b>스크롤해 보세요';hn.setAttribute('aria-label','위아래로 스크롤해 보세요');stage.appendChild(hn);
       d.addEventListener('scroll',()=>{if(d.scrollTop>8&&!hn.classList.contains('gone')){hn.classList.add('gone');setTimeout(()=>hn.remove(),300)}},{passive:true});}}
-  const n=Math.min(cur+1,10);
-  $('num').textContent=s.final?'완료':n+' / 10';
+  const n=cur+1;
+  $('num').textContent=n+' / '+STEPS.length;
   $('label').textContent=s.label;
-  [...$('dots').children].forEach((d,i)=>d.classList.toggle('on',i<(s.final?10:n)));
+  [...$('dots').children].forEach((d,i)=>d.classList.toggle('on',i<n));
   $('prev').disabled=cur===0;
   if(s.final){
-    const w=document.createElement('div'); w.className='done';
-    w.innerHTML='<p>새 주문접수채널 둘러보기를 모두 마쳤어요!</p><button class="home-btn" type="button">처음으로 돌아가기</button>';
+    const w=document.createElement('div'); w.className='done'+(s.doneCls?' '+s.doneCls:'');
+    w.innerHTML='<button class="home-btn" type="button">처음으로 돌아가기</button>';
     w.querySelector('button').onclick=()=>go(0);
-    screen.appendChild(w); return;
+    doneTimer=setTimeout(()=>screen.appendChild(w),1000); return;
   }
   const [x,y,w,h]=s.hot;
   const b=document.createElement('button'); b.type='button'; b.className='hot'; b.setAttribute('aria-label',s.tip);
   Object.assign(b.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});
-  b.onclick=e=>{e.stopPropagation();go(cur+1)};
+  b.onclick=e=>{e.stopPropagation();go(s.next!=null?s.next:cur+1)};
   screen.appendChild(b);
   const t=document.createElement('div'); t.className='tip '+s.pos; t.innerHTML=s.tip+(s.sub?'<small>'+s.sub+'</small>':'')+'<button type="button" class="tip-x" aria-label="안내 닫기">×</button>';
   t.querySelector('.tip-x').addEventListener('click',closeTip);
