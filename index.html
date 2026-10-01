@@ -103,7 +103,7 @@ const STEPS=[
  {img:'s07_cards',label:'카드형 목록으로 보기',hot:[12,268,80,74],tip:'주문내역 버튼을 눌러보세요',pos:'r'},
  {img:'s08_history',label:'주문내역 확인하기',hot:[12,358,80,74],tip:'설정 버튼을 눌러보세요',pos:'r'},
  {img:'s09_program',label:'설정 화면',hot:[104,288,196,48],tip:'영수증 설정 버튼을 눌러보세요',pos:'r'},
- {img:'s10_receipt',label:'영수증 설정',hot:[104,384,196,48],tip:'테스트 주문 버튼을 눌러보세요',sub:'주문 유형별로 테스트 주문을 할 수 있어요.',pos:'b',maxw:196,
+ {img:'s10_receipt',label:'영수증 설정',hot:[104,384,196,48],tip:'테스트 주문 버튼을 눌러보세요',pos:'b',maxw:196,
   scroll:{x:308,y:72,w:638,h:686,img:'s10_scroll',hint:[944,330]}},
  {img:'s11_test',label:'테스트 주문 화면',final:true}
 ];
@@ -152,7 +152,7 @@ function render(){
   const t=document.createElement('div'); t.className='tip '+s.pos; t.innerHTML=s.tip+(s.sub?'<small>'+s.sub+'</small>':'')+'<button type="button" class="tip-x" aria-label="안내 닫기">×</button>';
   t.querySelector('.tip-x').addEventListener('click',closeTip);
   stage.appendChild(t); placeTip();
-  tipTimer=setTimeout(showTip,1500);
+  tipTimer=setTimeout(showTip,1000);
 }
 function placeTip(){
   const hn=stage.querySelector('.hint'), S=STEPS[cur]; if(hn&&S.scroll&&S.scroll.hint){const kk=stage.clientWidth/1024; hn.style.left=(S.scroll.hint[0]*kk)+'px'; hn.style.top=(S.scroll.hint[1]*kk)+'px';}
