@@ -46,7 +46,11 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);margin:0;pad
 .hot::before{content:"";position:absolute;inset:-4px;border-radius:12px;border:3px solid var(--mint);box-shadow:0 0 0 4px rgba(42,193,188,.25)}
 .hot::after{content:"";position:absolute;inset:-4px;border-radius:12px;border:3px solid var(--mint);animation:ping 1.6s ease-out infinite}
 @keyframes ping{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.35);opacity:0}}
-.tip{position:absolute;z-index:5;word-break:keep-all;max-width:300px;background:var(--mint);color:var(--mint-ink);border-radius:12px;padding:12px 14px;font:700 clamp(13px,1.9vw,17px)/1.4 var(--f-body);box-shadow:0 10px 28px rgba(0,0,0,.28);pointer-events:none}
+.tip{position:absolute;z-index:5;word-break:keep-all;max-width:300px;background:var(--mint);color:var(--mint-ink);border-radius:12px;padding:12px 14px;font:700 clamp(13px,1.9vw,17px)/1.4 var(--f-body);box-shadow:0 10px 28px rgba(0,0,0,.28);pointer-events:none;padding-right:34px}
+.tip-x{position:absolute;top:6px;right:6px;width:24px;height:24px;border:0;border-radius:6px;background:transparent;color:var(--mint-ink);font:700 16px/1 var(--f-body);cursor:pointer;pointer-events:auto;display:grid;place-items:center;opacity:.75}
+.tip-x:hover{opacity:1;background:rgba(6,44,42,.1)}
+.tip-x:focus-visible{outline:2px solid var(--mint-ink);outline-offset:1px}
+.hint{transition:opacity .3s}.hint.gone{opacity:0}
 .tip small{display:block;font-weight:500;font-size:.8em;opacity:.85;margin-top:2px;white-space:normal}
 .tip::after{content:"";position:absolute;width:14px;height:14px;background:var(--mint);transform:rotate(45deg)}
 .tip.b::after{top:-6px;left:var(--ax,24px)}
@@ -106,7 +110,9 @@ const STEPS=[
 const $=id=>document.getElementById(id);
 const screen=$('screen'), stage=$('stage');
 let cur=0, tipTimer=null;
-function showTip(){clearTimeout(tipTimer);const t=stage.querySelector('.tip');if(t)t.classList.add('show')}
+let tipClosed=false;
+function showTip(){clearTimeout(tipTimer);if(tipClosed)return;const t=stage.querySelector('.tip');if(t)t.classList.add('show')}
+function closeTip(e){e.stopPropagation();clearTimeout(tipTimer);tipClosed=true;const t=stage.querySelector('.tip');if(t)t.remove()}
 $('dots').innerHTML=Array.from({length:10},()=>'<i></i>').join('');
 function sizeStage(){const wrap=stage.parentElement, note=document.querySelector('.note');
   const avail=window.innerHeight-(stage.getBoundingClientRect().top+window.scrollY)-8-12-1-2;
@@ -116,7 +122,7 @@ function fit(){screen.style.transform='scale('+(stage.clientWidth/1024)+')';plac
 new ResizeObserver(fit).observe(stage);
 function render(){
   const s=STEPS[cur];
-  clearTimeout(tipTimer); screen.innerHTML=''; stage.querySelectorAll('.tip,.hint').forEach(e=>e.remove());
+  clearTimeout(tipTimer); tipClosed=false; screen.innerHTML=''; stage.querySelectorAll('.tip,.hint').forEach(e=>e.remove());
   const base=new Image(); base.className='base'; base.src=IMG[s.img]; base.alt=s.label+' 화면'; base.draggable=false;
   screen.appendChild(base);
   if(s.scroll){const d=document.createElement('div');d.className='scroller';
@@ -125,7 +131,8 @@ function render(){
     const im=new Image(); im.src=IMG[s.scroll.img]; im.alt=''; d.appendChild(im); screen.appendChild(d);
     (s.scroll.arrows||[]).forEach(([ax,ay,aw,ah,dir])=>{const a=document.createElement('button');a.type='button';a.className='sbtn';a.setAttribute('aria-label',dir<0?'위로 스크롤':'아래로 스크롤');
       Object.assign(a.style,{left:ax+'px',top:ay+'px',width:aw+'px',height:ah+'px'});a.onclick=e=>{e.stopPropagation();d.scrollBy({top:dir*300,behavior:'smooth'})};screen.appendChild(a);});
-    if(s.scroll.hint){const hn=document.createElement('div');hn.className='hint';hn.innerHTML='<b>↕</b>스크롤해 보세요';hn.setAttribute('aria-label','위아래로 스크롤해 보세요');stage.appendChild(hn);}}
+    if(s.scroll.hint){const hn=document.createElement('div');hn.className='hint';hn.innerHTML='<b>↕</b>스크롤해 보세요';hn.setAttribute('aria-label','위아래로 스크롤해 보세요');stage.appendChild(hn);
+      d.addEventListener('scroll',()=>{if(d.scrollTop>8&&!hn.classList.contains('gone')){hn.classList.add('gone');setTimeout(()=>hn.remove(),300)}},{passive:true});}}
   const n=Math.min(cur+1,10);
   $('num').textContent=s.final?'완료':n+' / 10';
   $('label').textContent=s.label;
@@ -142,7 +149,8 @@ function render(){
   Object.assign(b.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});
   b.onclick=e=>{e.stopPropagation();go(cur+1)};
   screen.appendChild(b);
-  const t=document.createElement('div'); t.className='tip '+s.pos; t.innerHTML=s.tip+(s.sub?'<small>'+s.sub+'</small>':'');
+  const t=document.createElement('div'); t.className='tip '+s.pos; t.innerHTML=s.tip+(s.sub?'<small>'+s.sub+'</small>':'')+'<button type="button" class="tip-x" aria-label="안내 닫기">×</button>';
+  t.querySelector('.tip-x').addEventListener('click',closeTip);
   stage.appendChild(t); placeTip();
   tipTimer=setTimeout(showTip,1500);
 }
@@ -166,7 +174,7 @@ function placeTip(){
     t.style.setProperty('--ay',Math.max(10,y+h/2-top-7)+'px');
   }
 }
-screen.addEventListener('click',()=>{const t=stage.querySelector('.tip');if(!t)return;showTip();t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake')});
+screen.addEventListener('click',()=>{const t=stage.querySelector('.tip');if(!t||tipClosed)return;showTip();t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake')});
 function go(i){cur=Math.max(0,Math.min(STEPS.length-1,i));render();}
 $('prev').onclick=()=>go(cur-1);
 $('restart').onclick=()=>go(0);
