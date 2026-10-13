@@ -147,7 +147,8 @@ function closeInfo(e){
   const p=stage.querySelector('.info'); if(p) p.remove(); const fc=stage.querySelector('.focus'); if(fc) fc.remove(); infoOpen=false;
   showHint();
   const s=STEPS[cur];
-  if(s.final) later(showDone,2000); else later(revealButton,2000);
+  const dl=(s.info&&s.info.box)?0:2000;
+  if(s.final) later(showDone,dl); else later(revealButton,dl);
 }
 
 function render(){
