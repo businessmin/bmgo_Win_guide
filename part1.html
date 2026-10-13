@@ -61,6 +61,8 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);margin:0;pad
 .info .x{position:absolute;top:10px;right:10px;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:var(--muted);font:700 18px/1 var(--f-body);cursor:pointer}
 .info .x:hover{background:#F1F4F4}
 .info.shake{animation:shake .5s}
+.focus{position:absolute;z-index:5;border:3px solid var(--mint);border-radius:calc(14px * var(--k));box-shadow:0 0 0 4px rgba(42,193,188,.35),0 0 0 9999px rgba(10,16,16,.5);pointer-events:none;animation:glow 1.4s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 0 9px rgba(42,193,188,.25),0 0 0 9999px rgba(10,16,16,.5)}}
 @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
 .done{position:absolute;left:30.08%;right:.98%;bottom:3.9%;display:flex;justify-content:center;animation:rise .5s ease-out both}
 .home-btn{font:700 calc(22px * var(--k)) var(--f-body);color:#fff;background:#16201F;border:0;border-radius:calc(14px * var(--k));padding:calc(20px * var(--k)) calc(52px * var(--k));cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.2)}
@@ -71,7 +73,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);margin:0;pad
 .wrap.bare .head{display:none}
 .wrap.bare .stage{box-shadow:none;border-radius:0}
 body:has(.wrap.bare){padding:0}
-@media (prefers-reduced-motion:reduce){.hot::after,.done,.tip.shake,.hint b,.hot.nudge,.info,.info.shake{animation:none}.tip,.tip.show{transition:none}}
+@media (prefers-reduced-motion:reduce){.focus,.hot::after,.done,.tip.shake,.hint b,.hot.nudge,.info,.info.shake{animation:none}.tip,.tip.show{transition:none}}
 </style>
 </head><body>
 
@@ -93,11 +95,11 @@ const STEPS=[
   info:{tag:'홈 화면',text:'배민셀프서비스를 그대로 이용할 수 있어요.'},
   scroll:{x:104,y:128,w:854,h:630,img:'s02_scroll',hint:[952,443],br:'0 0 0 16px',arrows:[[958,144,48,299,-1],[958,443,48,299,1]]}},
  {img:'s03_status',label:'영업현황',hot:[964,16,40,40],tip:'고객센터 버튼을 눌러보세요',pos:'b',align:'right',
-  info:{tag:'영업현황',text:'가게의 영업 상태를 주문 유형별로 확인하고, 영업임시중지도 바로 설정할 수 있어요.',at:[580,346,'l']}},
+  info:{tag:'영업현황',text:'가게의 영업 상태를 주문 유형별로 확인하고, 영업임시중지도 바로 설정할 수 있어요.',at:[580,346,'l'],box:[154,56,402,580]}},
  {img:'s04_cs',label:'고객센터',hot:[900,16,40,40],tip:'알림센터 버튼을 눌러보세요',pos:'l',
-  info:{tag:'고객센터',text:'손실금 환급접수, 배차/픽업 확인 등 다양한 기능을 빠르게 이용할 수 있어요.',at:[556,346,'r']}},
+  info:{tag:'고객센터',text:'손실금 환급접수, 배차/픽업 확인 등 다양한 기능을 빠르게 이용할 수 있어요.',at:[556,346,'r'],box:[580,56,434,580]}},
  {img:'s05_noti',label:'알림센터',final:true,doneCls:'card',
-  info:{tag:'알림센터',text:'가게 운영에 필요한 알림을 한곳에서 확인할 수 있어요.'}}
+  info:{tag:'알림센터',text:'가게 운영에 필요한 알림을 한곳에서 확인할 수 있어요.',at:[621,346,'r'],box:[637,56,378,580]}}
 ];
 const $=id=>document.getElementById(id);
 const screen=$('screen'), stage=$('stage');
@@ -133,7 +135,7 @@ function showDone(){
 }
 function closeInfo(e){
   if(e) e.stopPropagation();
-  const p=stage.querySelector('.info'); if(p) p.remove(); infoOpen=false;
+  const p=stage.querySelector('.info'); if(p) p.remove(); const fc=stage.querySelector('.focus'); if(fc) fc.remove(); infoOpen=false;
   showHint();
   const s=STEPS[cur];
   if(s.final) later(showDone,2000); else later(revealButton,2000);
@@ -142,7 +144,7 @@ function closeInfo(e){
 function render(){
   const s=STEPS[cur];
   clearAll(); tipClosed=false; infoOpen=false;
-  screen.innerHTML=''; stage.querySelectorAll('.tip,.hint,.info').forEach(e=>e.remove());
+  screen.innerHTML=''; stage.querySelectorAll('.tip,.hint,.info,.focus').forEach(e=>e.remove());
   const base=new Image(); base.className='base'; base.src=IMG[s.img]; base.alt=s.label+' 화면'; base.draggable=false;
   screen.appendChild(base);
   if(s.scroll){
@@ -173,6 +175,7 @@ function render(){
     p.innerHTML='<button type="button" class="x" aria-label="설명 닫기">×</button><span class="tag">'+s.info.tag+'</span><p>'+s.info.text+'</p><button type="button" class="ok">확인</button>';
     p.querySelector('.x').onclick=closeInfo; p.querySelector('.ok').onclick=closeInfo;
     p.addEventListener('click',e=>e.stopPropagation());
+    if(s.info.box){const fc=document.createElement('div'); fc.className='focus'; pct(fc,...s.info.box); stage.appendChild(fc);}
     stage.appendChild(p);
   }else if(s.final){later(showDone,1000)}
   else{later(revealButton,1000)}
