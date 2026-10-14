@@ -61,6 +61,8 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);margin:0;pad
 .info .x{position:absolute;top:10px;right:10px;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:var(--muted);font:700 18px/1 var(--f-body);cursor:pointer}
 .info .x:hover{background:#F1F4F4}
 .info.shake{animation:shake .5s}
+.focus{position:absolute;z-index:5;border:3px solid var(--mint);border-radius:calc(14px * var(--k));box-shadow:0 0 0 4px rgba(42,193,188,.35),0 0 0 9999px rgba(10,16,16,.5);pointer-events:none;animation:glow 1.4s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 0 9px rgba(42,193,188,.25),0 0 0 9999px rgba(10,16,16,.5)}}
 @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
 .done{position:absolute;left:30.08%;right:.98%;bottom:3.9%;display:flex;justify-content:center;animation:rise .5s ease-out both}
 .home-btn{font:700 calc(22px * var(--k)) var(--f-body);color:#fff;background:#16201F;border:0;border-radius:calc(14px * var(--k));padding:calc(20px * var(--k)) calc(52px * var(--k));cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.2)}
@@ -71,7 +73,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);margin:0;pad
 .wrap.bare .head{display:none}
 .wrap.bare .stage{box-shadow:none;border-radius:0}
 body:has(.wrap.bare){padding:0}
-@media (prefers-reduced-motion:reduce){.hot::after,.done,.tip.shake,.hint b,.hot.nudge,.info,.info.shake{animation:none}.tip,.tip.show{transition:none}}
+@media (prefers-reduced-motion:reduce){.focus,.hot::after,.done,.tip.shake,.hint b,.hot.nudge,.info,.info.shake{animation:none}.tip,.tip.show{transition:none}}
 </style>
 </head><body>
 
@@ -89,9 +91,8 @@ body:has(.wrap.bare){padding:0}
 <script>
 const IMG={"s09_program": "images/s09_program.webp", "s10_receipt": "images/s10_receipt.webp", "s10_scroll": "images/s10_scroll.webp", "s11_test": "images/s11_test.webp"};
 const STEPS=[
- {img:'s09_program',label:'설정 지면',hot:[104,288,196,48],tip:'영수증 설정 버튼을 눌러보세요',pos:'r',
-  info:{tag:'설정 지면',text:'달라진 설정 지면을 확인해 보세요.'}},
- {img:'s10_receipt',label:'영수증 설정',hot:[104,384,196,48],tip:'테스트 주문 버튼을 눌러보세요',pos:'b',maxw:196,
+ {img:'s09_program',label:'설정 지면',hot:[104,288,196,48],tip:'영수증 설정 버튼을 눌러보세요',pos:'r',now:true,buzz:1000},
+ {img:'s10_receipt',label:'영수증 설정',hot:[104,384,196,48],tip:'테스트 주문 버튼을 눌러보세요',pos:'b',maxw:196,buzz:1000,
   info:{tag:'영수증 설정',text:'직접 영수증 양식을 조정할 수 있어요.'},
   scroll:{x:308,y:155,w:638,h:603,img:'s10_scroll',hint:[944,330]}},
  {img:'s11_test',label:'테스트 주문',final:true,
@@ -116,7 +117,7 @@ function nudge(){
   h.classList.remove('nudge'); void h.offsetWidth; h.classList.add('nudge');
   const t=stage.querySelector('.tip'); if(t&&!tipClosed){t.classList.add('show');t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake')}
 }
-function startIdle(){clearInterval(idle);idle=setInterval(nudge,5000)}
+function startIdle(){clearInterval(idle);const iv=STEPS[cur].buzz||5000;idle=setInterval(nudge,iv);if(STEPS[cur].buzz)nudge()}
 function revealButton(){
   const h=screen.querySelector('.hot'); if(h) h.classList.remove('wait');
   const t=stage.querySelector('.tip'); if(t&&!tipClosed) t.classList.add('show');
@@ -131,16 +132,17 @@ function showDone(){
 }
 function closeInfo(e){
   if(e) e.stopPropagation();
-  const p=stage.querySelector('.info'); if(p) p.remove(); infoOpen=false;
+  const p=stage.querySelector('.info'); if(p) p.remove(); const fc=stage.querySelector('.focus'); if(fc) fc.remove(); infoOpen=false;
   showHint();
   const s=STEPS[cur];
-  if(s.final) later(showDone,2000); else later(revealButton,2000);
+  const dl=s.after!=null?s.after:2000;
+  if(s.final) later(showDone,dl); else later(revealButton,dl);
 }
 
 function render(){
   const s=STEPS[cur];
   clearAll(); tipClosed=false; infoOpen=false;
-  screen.innerHTML=''; stage.querySelectorAll('.tip,.hint,.info').forEach(e=>e.remove());
+  screen.innerHTML=''; stage.querySelectorAll('.tip,.hint,.info,.focus').forEach(e=>e.remove());
   const base=new Image(); base.className='base'; base.src=IMG[s.img]; base.alt=s.label+' 화면'; base.draggable=false;
   screen.appendChild(base);
   if(s.scroll){
@@ -171,9 +173,10 @@ function render(){
     p.innerHTML='<button type="button" class="x" aria-label="설명 닫기">×</button><span class="tag">'+s.info.tag+'</span><p>'+s.info.text+'</p><button type="button" class="ok">확인</button>';
     p.querySelector('.x').onclick=closeInfo; p.querySelector('.ok').onclick=closeInfo;
     p.addEventListener('click',e=>e.stopPropagation());
+    if(s.info.box){const fc=document.createElement('div'); fc.className='focus'; pct(fc,...s.info.box); stage.appendChild(fc);}
     stage.appendChild(p);
   }else if(s.final){later(showDone,1000)}
-  else{later(revealButton,1000)}
+  else{later(revealButton,s.now?0:1000)}
   placeAll();
 }
 

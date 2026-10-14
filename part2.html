@@ -91,9 +91,8 @@ body:has(.wrap.bare){padding:0}
 <script>
 const IMG={"s06_tray": "images/s06_tray.webp", "s07_cards": "images/s07_cards.webp"};
 const STEPS=[
- {img:'s06_tray',label:'처리중',hot:[955,82,40,40],tip:'카드형 목록 버튼을 눌러보세요',pos:'b',align:'right',
-  info:{tag:'처리중',text:'달라진 처리중 지면을 확인해 보세요.'}},
- {img:'s07_cards',label:'카드형 목록',hot:[914,82,40,40],tip:'이전 화면으로 돌아가기',pos:'b',align:'right',next:0,
+ {img:'s06_tray',label:'처리중',hot:[955,82,40,40],tip:'카드형 목록 버튼을 눌러보세요',pos:'b',align:'right',now:true,buzz:1000},
+ {img:'s07_cards',label:'카드형 목록',hot:[914,82,40,40],tip:'이전 화면으로 돌아가기',pos:'b',align:'right',next:0,after:1000,
   info:{tag:'카드형 목록',text:'여러 주문을 카드형으로 한눈에 확인하고, 빠르게 접수 처리할 수 있어요.'}}
 ];
 const $=id=>document.getElementById(id);
@@ -115,7 +114,7 @@ function nudge(){
   h.classList.remove('nudge'); void h.offsetWidth; h.classList.add('nudge');
   const t=stage.querySelector('.tip'); if(t&&!tipClosed){t.classList.add('show');t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake')}
 }
-function startIdle(){clearInterval(idle);idle=setInterval(nudge,5000)}
+function startIdle(){clearInterval(idle);const iv=STEPS[cur].buzz||5000;idle=setInterval(nudge,iv);if(STEPS[cur].buzz)nudge()}
 function revealButton(){
   const h=screen.querySelector('.hot'); if(h) h.classList.remove('wait');
   const t=stage.querySelector('.tip'); if(t&&!tipClosed) t.classList.add('show');
@@ -133,7 +132,8 @@ function closeInfo(e){
   const p=stage.querySelector('.info'); if(p) p.remove(); const fc=stage.querySelector('.focus'); if(fc) fc.remove(); infoOpen=false;
   showHint();
   const s=STEPS[cur];
-  if(s.final) later(showDone,2000); else later(revealButton,2000);
+  const dl=s.after!=null?s.after:2000;
+  if(s.final) later(showDone,dl); else later(revealButton,dl);
 }
 
 function render(){
@@ -173,7 +173,7 @@ function render(){
     if(s.info.box){const fc=document.createElement('div'); fc.className='focus'; pct(fc,...s.info.box); stage.appendChild(fc);}
     stage.appendChild(p);
   }else if(s.final){later(showDone,1000)}
-  else{later(revealButton,1000)}
+  else{later(revealButton,s.now?0:1000)}
   placeAll();
 }
 
