@@ -68,6 +68,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);margin:0;pad
 .home-btn{font:700 calc(22px * var(--k)) var(--f-body);color:#fff;background:#16201F;border:0;border-radius:calc(14px * var(--k));padding:calc(20px * var(--k)) calc(52px * var(--k));cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.2)}
 .home-btn:hover{background:#000}
 @keyframes rise{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+@media (max-width:600px){body{padding:3px}.wrap{padding:6px;gap:5px;border-radius:10px}.head{flex-wrap:nowrap;gap:6px}.head h1{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.ctrl{gap:4px;flex:none}.btn{font-size:11px;padding:3px 7px;border-radius:6px}.stage{border-radius:8px}}
 @media (prefers-reduced-motion:reduce){.focus,.hot::after,.done,.tip.shake,.hint b,.hot.nudge,.info,.info.shake{animation:none}.tip,.tip.show{transition:none}}
 </style>
 </head><body>
@@ -118,7 +119,7 @@ function clearAll(){timers.forEach(clearTimeout);timers=[];clearInterval(idle);i
 const pct=(el,x,y,w,h)=>Object.assign(el.style,{left:x/10.24+'%',top:y/7.68+'%',width:w/10.24+'%',height:h/7.68+'%'});
 
 function sizeStage(){const wrap=stage.parentElement;
-  const avail=window.innerHeight-(stage.getBoundingClientRect().top+window.scrollY)-6-10-1-2;
+  const avail=window.innerHeight-(stage.getBoundingClientRect().top+window.scrollY)-(innerWidth<=600?10:19);
   const w=Math.min(wrap.clientWidth-20,Math.max(320,avail*4/3)); stage.style.width=Math.floor(w)+'px';}
 window.addEventListener('resize',sizeStage);
 function fit(){stage.style.setProperty('--k',stage.clientWidth/1024);placeAll()}
@@ -147,7 +148,7 @@ function closeInfo(e){
   const p=stage.querySelector('.info'); if(p) p.remove(); const fc=stage.querySelector('.focus'); if(fc) fc.remove(); infoOpen=false;
   showHint();
   const s=STEPS[cur];
-  const dl=(s.info&&s.info.box)?0:2000;
+  const dl=(s.info&&s.info.box)?0:1000;
   if(s.final) later(showDone,dl); else later(revealButton,dl);
 }
 
